@@ -125,7 +125,7 @@
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
       "targets": [
         {
-          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> group(columns: [\"entity_id\"]) |> count() |> sort(columns: [\"_value\"], desc: true) |> limit(n: 15) |> yield(name: \"Entity Activity\")",
+          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> group(columns: [\"entity_id\"]) |> count() |> sort(columns: [\"_value\"], desc: true) |> limit(n: 15) |> yield(name: \"Entity Activity Count\")",
           "refId": "A"
         }
       ],
@@ -227,7 +227,7 @@
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20},
       "targets": [
         {
-          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> group(columns: [\"source\"]) |> count() |> yield(name: \"Source Activity\")",
+          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> group(columns: [\"source\"]) |> count() |> yield(name: \"Data Source Activity\")",
           "refId": "A"
         }
       ],
@@ -273,11 +273,11 @@
       "gridPos": {"h": 4, "w": 12, "x": 12, "y": 20},
       "targets": [
         {
-          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> filter(fn: (r) => r[\"_field\"] == \"state\") |> count() |> yield(name: \"State Changes\")",
+          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> filter(fn: (r) => r[\"_field\"] == \"state\") |> count() |> yield(name: \"State Change Events\")",
           "refId": "A"
         },
         {
-          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> count() |> yield(name: \"Value Updates\")",
+          "query": "from(bucket: \"ha_events\") |> range(start: -24h) |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/) |> filter(fn: (r) => r[\"_field\"] == \"value\") |> count() |> yield(name: \"Sensor Value Updates\")",
           "refId": "B"
         }
       ],
