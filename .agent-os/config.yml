@@ -5,16 +5,36 @@
 
 agent_os_version: 1.4.0
 
+# MCP (Model Context Protocol) Configuration
+mcp:
+  enabled: true
+  context7_integration: true
+  servers:
+    - name: context7-ha-cleanup
+      command: ["node", "src/mcp-server.js"]
+      env:
+        PROJECT_ROOT: "."
+        AGENT_OS_PATH: ".agent-os"
+        NODE_ENV: "development"
+      transport: stdio
+      capabilities:
+        resources: true
+        tools: true
+        prompts: true
+
 agents:
   claude_code:
-    enabled: false
+    enabled: true
+    mcp_integration: true
   cursor:
     enabled: true
+    mcp_integration: true
 
 project_types:
   default:
     instructions: ./.agent-os/instructions
     standards: ./.agent-os/standards
+    mcp_server: src/mcp-server.js
 
   # type_a:
   #   instructions: ~/.agent-os/project_types/type_a/instructions
@@ -25,3 +45,10 @@ project_types:
   #   standards: ~/.agent-os/project_types/type_b/standards
 
 default_project_type: default
+
+# Context7 specific configuration
+context7:
+  enabled: true
+  auto_pattern_detection: true
+  real_time_standards_check: true
+  ai_assistant_integration: true

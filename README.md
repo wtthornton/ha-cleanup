@@ -16,9 +16,32 @@ HA-Cleanup is a lightweight, focused analytics tool that integrates seamlessly w
 ## 🚀 **Quick Start**
 
 ### **Prerequisites**
-- ha-ingestor must be deployed and running
-- InfluxDB must be accessible from ha-cleanup container
+- ha-ingestor must be deployed and running with API endpoints
+- ha-ingestor API must be accessible from ha-cleanup container
 - Node.js 20+ and npm/yarn
+
+## 🔌 **API-First Architecture** ✅
+
+### **What Changed**
+- **Before**: Direct InfluxDB access through InfluxDB client
+- **After**: Centralized data access through ha-ingestor RESTful API
+
+### **Benefits**
+- **Enhanced Security**: No database credentials in client applications
+- **Better Scalability**: Support for multiple consumer applications
+- **Improved Performance**: Optimized caching and request deduplication
+- **Centralized Management**: Single source of truth for data access logic
+- **Future-Proof**: Ready for real-time streaming and additional features
+
+### **New Features Available**
+- **Enhanced Data Hooks**: `useEvents`, `useMetrics`, `useDataExport`, `useCustomQuery`
+- **Data Export**: JSON, CSV, and XML format support
+- **Custom Queries**: Execute sanitized Flux queries through API
+- **API Health Monitoring**: Connection status and latency tracking
+- **Advanced Filtering**: Domain, entity, and time-based filtering
+
+### **Migration Guide**
+See [MIGRATION_TO_API.md](MIGRATION_TO_API.md) for detailed migration instructions and examples.
 
 ### **Development Setup**
 ```bash
@@ -79,7 +102,8 @@ ha-cleanup/
 
 ### **Backend**
 - **Node.js 20+** with Express.js
-- **InfluxDB Client** for ha-ingestor data access
+- **ha-ingestor API** for centralized data access
+- **HAIngestorAPIClient** for type-safe API integration
 - **SQLite** for local data storage
 - **Zod** for runtime validation
 
@@ -106,10 +130,11 @@ ha-cleanup/
 ## 🔗 **Integration with ha-ingestor**
 
 ### **Data Access**
-- Read-only access to existing InfluxDB data
-- Follows ha-ingestor data structure and naming conventions
-- Uses established Flux query patterns
-- Optimized for large time-series datasets
+- **API-First Architecture**: Centralized data access through ha-ingestor RESTful API
+- **HAIngestorAPIClient**: Type-safe API client with enhanced error handling and retry logic
+- **Backward Compatibility**: All existing functionality continues to work
+- **Enhanced Features**: Pagination, aggregation, export, and custom query support
+- **Performance Optimization**: Smart caching and request deduplication through React Query
 
 ### **Deployment**
 - Runs alongside ha-ingestor in Docker environment
@@ -207,11 +232,17 @@ docker-compose -f docker-compose.production.yml up -d
 
 ### **Environment Variables**
 ```bash
-# InfluxDB connection
-INFLUXDB_URL=http://ha-ingestor:8086
-INFLUXDB_TOKEN=your-token
-INFLUXDB_ORG=your-org
-INFLUXDB_BUCKET=home_assistant
+# ha-ingestor API Configuration
+VITE_HA_INGESTOR_API_URL=http://localhost:8000
+VITE_API_TIMEOUT=30000
+VITE_API_RETRY_ATTEMPTS=3
+VITE_API_ENABLE_LOGGING=true
+
+# Legacy InfluxDB (for fallback)
+VITE_INFLUXDB_URL=http://ha-ingestor:8086
+VITE_INFLUXDB_TOKEN=your-token
+VITE_INFLUXDB_ORG=your-org
+VITE_INFLUXDB_BUCKET=home_assistant
 
 # Application settings
 NODE_ENV=production
@@ -239,26 +270,29 @@ PORT=3000
 
 ## 📋 **Roadmap**
 
-### **Phase 1: Core MVP (Weeks 1-4)**
+### **Phase 1: Core MVP (Weeks 1-4)** ✅ **COMPLETED**
 - [x] Project setup and documentation
-- [ ] Basic UI framework with mobile-first design
-- [ ] Data connection to ha-ingestor InfluxDB
-- [ ] Event browser with basic filtering
-- [ ] Simple charts for data visualization
-- [ ] Mock data mode for rapid iteration
+- [x] Basic UI framework with mobile-first design
+- [x] **API-First Architecture**: ha-ingestor API integration with HAIngestorAPIClient
+- [x] Event browser with basic filtering
+- [x] Simple charts for data visualization
+- [x] Mock data mode for rapid iteration
 
-### **Phase 2: Analysis & Insights (Weeks 5-8)**
+### **Phase 2: Analysis & Insights (Weeks 5-8)** 🚀 **IN PROGRESS**
+- [x] **API Integration**: Complete ha-ingestor API integration with enhanced features
+- [x] **Enhanced Data Access**: Pagination, aggregation, and export capabilities
 - [ ] Pattern recognition and anomaly detection
 - [ ] Performance metrics and efficiency indicators
 - [ ] Suggestion engine and approval workflow
-- [ ] Enhanced charts with interactive features
-- [ ] Export functionality for reports
+- [x] Enhanced charts with interactive features
+- [x] **Export Functionality**: JSON, CSV, and XML export support
 
 ### **Phase 3: Polish & Optimization (Weeks 9-12)**
 - [ ] Advanced analytics and trend detection
 - [ ] Custom dashboards and user preferences
 - [ ] PWA features and offline capabilities
-- [ ] Performance optimization and advanced filtering
+- [x] **Performance Optimization**: API-enabled optimizations with React Query
+- [x] **Advanced Filtering**: Complex query building and saved filters
 - [ ] Notification system and alerts
 
 ## 🐛 **Troubleshooting**

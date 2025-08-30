@@ -1,0 +1,44 @@
+# Cursor.ai Configuration for ha-cleanup
+
+## Project Overview
+This is a mobile-first React web application for analyzing Home Assistant historical data from ha-ingestor deployments. The project uses TypeScript, Vite, Tailwind CSS, and follows modern React patterns.
+
+## Code Style & Standards
+- Use TypeScript strict mode
+- Follow React 18+ patterns with hooks
+- Use functional components with proper TypeScript interfaces
+- Implement mobile-first responsive design
+- Use Tailwind CSS for styling
+- Follow ESLint and Prettier configurations
+
+## Architecture Guidelines
+- Keep components small and focused
+- Use custom hooks for data fetching and state management
+- Implement proper error boundaries and loading states
+- Use React Query for server state management
+- Follow the established folder structure
+
+## Testing Requirements
+- Write tests for all new components and hooks
+- Use React Testing Library for component testing
+- Maintain high test coverage
+- Test mobile responsiveness
+
+## Performance Considerations
+- Implement proper memoization where needed
+- Use React.lazy for code splitting
+- Optimize bundle size with Vite
+- Ensure mobile performance
+
+## File Naming Conventions
+- Components: PascalCase (e.g., EventList.tsx)
+- Hooks: camelCase with 'use' prefix (e.g., useInfluxData.ts)
+- Utilities: camelCase (e.g., chartUtils.ts)
+- Types: camelCase (e.g., app.ts, influxdb.ts)
+
+## Import Organization
+- React imports first
+- Third-party libraries
+- Internal components and hooks
+- Types and utilities
+- Relative imports last

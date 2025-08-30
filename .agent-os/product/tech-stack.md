@@ -4,9 +4,15 @@
 - **Node.js 20+** with Express.js for backend API
 - **React 18+** with TypeScript for frontend
 
+## **Data Access Architecture** ✅ **UPDATED**
+- **ha-ingestor API** - RESTful API endpoints for centralized data access
+- **HAIngestorAPIClient** - Type-safe API client with error handling and retry logic
+- **React Query Integration** - Optimized data fetching with caching and deduplication
+- **Backward Compatibility** - Legacy InfluxDB client maintained for fallback scenarios
+
 ## Database System
-- **InfluxDB 2.7+** (read-only access to existing ha-ingestor data)
-- **SQLite** for local suggestion tracking and user preferences
+- **ha-ingestor InfluxDB** - Centralized data storage with API access layer
+- **SQLite** - Local suggestion tracking and user preferences
 
 ## JavaScript Framework
 - **React 18+** with TypeScript for component-based UI development
@@ -33,7 +39,7 @@
 - **Local network** deployment for home use
 
 ## Database Hosting
-- **Existing InfluxDB** from ha-ingestor deployment
+- **ha-ingestor API** - Centralized data access through RESTful endpoints
 - **Local SQLite** file for application data
 
 ## Asset Hosting
@@ -57,12 +63,18 @@
 - **Date-fns** for date manipulation
 - **Zod** for runtime type validation
 
+### **API Integration Dependencies** ✅ **NEW**
+- **HAIngestorAPIClient** - Custom API client for ha-ingestor integration
+- **Enhanced Error Handling** - RetryHandler with exponential backoff
+- **Request Management** - AbortController for timeout handling
+- **Data Transformation** - Automatic format conversion for backward compatibility
+
 ### Backend Dependencies
 - **Express.js** for REST API endpoints
 - **CORS** for cross-origin resource sharing
 - **Helmet** for security headers
 - **Morgan** for HTTP request logging
-- **InfluxDB Client** for data access
+- **ha-ingestor API** - Primary data source through REST endpoints
 
 ### Development Tools
 - **Vite** for fast development and building
@@ -80,3 +92,30 @@
 - **PWA capabilities** for mobile app-like experience
 - **Responsive design** with mobile-first approach
 - **Touch-friendly interactions** for mobile devices
+
+## **API-First Architecture Benefits** ✅
+
+### **Centralized Data Management**
+- Single API layer for all consumer applications
+- Consistent data access patterns and error handling
+- Centralized monitoring and logging
+
+### **Enhanced Security**
+- No direct database credentials in client applications
+- Centralized authentication and authorization
+- API rate limiting and request validation
+
+### **Scalability & Performance**
+- Support for multiple consumer applications
+- Optimized data transformation and caching
+- Reduced database connection overhead
+
+### **Developer Experience**
+- Type-safe API client with comprehensive interfaces
+- Automatic retry logic and error recovery
+- Optimized React Query integration
+
+### **Future-Proof Design**
+- Ready for real-time data streaming
+- Extensible API with versioning support
+- Support for additional ha-ingestor features

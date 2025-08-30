@@ -1,0 +1,175 @@
+{
+  "id": null,
+  "title": "Production Raw Data Explorer Dashboard",
+  "tags": [
+    "raw-data",
+    "data-exploration",
+    "home-assistant",
+    "ha-ingestor",
+    "production",
+    "prod"
+  ],
+  "style": "dark",
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Raw Event Data Table",
+      "type": "table",
+      "gridPos": {"h": 12, "w": 24, "x": 0, "y": 0},
+      "targets": [
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> sort(columns: [\"_time\"], desc: true)\n  |> limit(n: 100)\n  |> keep(columns: [\"_time\", \"_measurement\", \"entity_id\", \"domain\", \"state\", \"source\", \"_field\", \"_value\"])",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Entity State Distribution (Raw)",
+      "type": "table",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12},
+      "targets": [
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> filter(fn: (r) => r[\"_field\"] == \"state\")\n  |> group(columns: [\"entity_id\", \"domain\", \"state\"])\n  |> count()\n  |> sort(columns: [\"_value\"], desc: true)\n  |> limit(n: 50)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 10},
+              {"color": "red", "value": 50}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Attribute Values Breakdown",
+      "type": "table",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12},
+      "targets": [
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> filter(fn: (r) => r[\"_field\"] =~ /attr_.*/)\n  |> group(columns: [\"_field\", \"_value\"])\n  |> count()\n  |> sort(columns: [\"_value\"], desc: true)\n  |> limit(n: 50)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "thresholds"},
+          "thresholds": {
+            "steps": [
+              {"color": "green", "value": null},
+              {"color": "yellow", "value": 5},
+              {"color": "red", "value": 20}
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Sensor Value Ranges",
+      "type": "stat",
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 20},
+      "targets": [
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> filter(fn: (r) => r[\"domain\"] == \"sensor\")\n  |> filter(fn: (r) => r[\"_field\"] == \"state\")\n  |> filter(fn: (r) => r[\"state\"] =~ /^[0-9.]+$/)\n  |> map(fn: (r) => ({r with _value: float(v: r.state)}))\n  |> reduce(fn: (r, accumulator) => ({\n    min: if exists accumulator.min then min(x: accumulator.min, y: r._value) else r._value,\n    max: if exists accumulator.max then max(x: accumulator.max, y: r._value) else r._value,\n    count: accumulator.count + 1\n  }), identity: {min: 0.0, max: 0.0, count: 0})\n  |> yield(name: \"Sensor Range\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "short",
+          "displayName": "Sensor Values"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Binary Sensor State Changes",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 18, "x": 6, "y": 20},
+      "targets": [
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> filter(fn: (r) => r[\"domain\"] == \"binary_sensor\")\n  |> filter(fn: (r) => r[\"_field\"] == \"state\")\n  |> aggregateWindow(every: 5m, fn: count, createEmpty: false)\n  |> group(columns: [\"state\"])\n  |> yield(name: \"{{state}}\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "fillOpacity": 20
+          }
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Device Class Distribution",
+      "type": "piechart",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28},
+      "targets": [
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> filter(fn: (r) => r[\"_field\"] == \"attr_device_class\")\n  |> group(columns: [\"_value\"])\n  |> count()\n  |> yield(name: \"{{_value}}\")",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"}
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Measurement Types Overview",
+      "type": "stat",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28},
+      "targets": [
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> group(columns: [\"_measurement\"])\n  |> distinct(column: \"_measurement\")\n  |> count()\n  |> yield(name: \"Unique Measurements\")",
+          "refId": "A"
+        },
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> group(columns: [\"domain\"])\n  |> distinct(column: \"domain\")\n  |> count()\n  |> yield(name: \"Unique Domains\")",
+          "refId": "B"
+        },
+        {
+          "query": "from(bucket: \"ha_events\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r[\"_measurement\"] =~ /ha_/)\n  |> group(columns: [\"entity_id\"])\n  |> distinct(column: \"entity_id\")\n  |> count()\n  |> yield(name: \"Unique Entities\")",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {"mode": "palette-classic"},
+          "unit": "short"
+        }
+      }
+    }
+  ]
+}
